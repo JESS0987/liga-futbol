@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liga de Fútbol</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #00c853;
+    --verde-oscuro: #009624;
+    --negro: #0a0a0a;
+    --gris-oscuro: #141414;
+    --gris-medio: #1e1e1e;
+    --gris-borde: #2a2a2a;
+    --texto: #e0e0e0;
+    --texto-muted: #666;
+    --acento: #00e676;
+    --rojo: #ff1744;
+    --amarillo: #ffd600;
+    --azul: #2979ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--negro);
+    color: var(--texto);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--gris-oscuro);
+    border-bottom: 2px solid var(--verde);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--acento);
+    letter-spacing: 2px;
+  }
+
+  .logo span { color: var(--texto-muted); font-size: 1rem; margin-left: 8px; font-family: 'Inter', sans-serif; }
+
+  .api-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--texto-muted);
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--rojo);
+    animation: pulse 2s infinite;
+  }
+  .status-dot.online { background: var(--acento); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* NAV */
+  nav {
+    background: var(--gris-oscuro);
+    border-bottom: 1px solid var(--gris-borde);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    color: var(--texto-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  nav button:hover { color: var(--texto); }
+  nav button.active { color: var(--acento); border-bottom-color: var(--acento); }
+
+  /* MAIN */
+  main { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+
+  .section { display: none; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    color: var(--acento);
+  }
+
+  /* BUTTONS */
+  .btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary { background: var(--verde); color: #000; }
+  .btn-primary:hover { background: var(--acento); transform: translateY(-1px); }
+  .btn-danger { background: var(--rojo); color: #fff; }
+  .btn-danger:hover { opacity: 0.85; }
+  .btn-secondary { background: var(--gris-borde); color: var(--texto); }
+  .btn-secondary:hover { background: #333; }
+  .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.7rem; }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    background: var(--gris-medio);
+    border: 1px solid var(--gris-borde);
+    border-radius: 8px;
+    padding: 1.2rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--verde-oscuro); }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    color: var(--acento);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid var(--gris-borde);
+    font-size: 0.82rem;
+  }
+
+  .card-row:last-child { border-bottom: none; }
+  .card-row .label { color: var(--texto-muted); }
+  .card-row .value { color: var(--texto); font-weight: 500; }
+
+  .card-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .badge-green { background: rgba(0,200,83,0.15); color: var(--acento); border: 1px solid var(--verde-oscuro); }
+  .badge-red { background: rgba(255,23,68,0.15); color: var(--rojo); border: 1px solid var(--rojo); }
+  .badge-yellow { background: rgba(255,214,0,0.15); color: var(--amarillo); border: 1px solid var(--amarillo); }
+  .badge-blue { background: rgba(41,121,255,0.15); color: var(--azul); border: 1px solid var(--azul); }
+
+  /* TABLA POSICIONES */
+  .tabla-container { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  thead tr {
+    background: var(--gris-borde);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    color: var(--texto-muted);
+  }
+
+  th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--gris-borde); }
+  td:first-child { font-weight: 600; }
+
+  tbody tr:hover { background: var(--gris-medio); }
+
+  tbody tr:first-child td:last-child { color: var(--acento); font-weight: 700; font-size: 1rem; }
+
+  .pos-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .pos-1 { background: var(--amarillo); color: #000; }
+  .pos-2 { background: #ccc; color: #000; }
+  .pos-3 { background: #cd7f32; color: #000; }
+  .pos-other { background: var(--gris-borde); color: var(--texto-muted); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--gris-medio);
+    border: 1px solid var(--gris-borde);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--acento);
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group { margin-bottom: 1rem; }
+
+  .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--texto-muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    background: var(--gris-oscuro);
+    border: 1px solid var(--gris-borde);
+    border-radius: 4px;
+    padding: 0.6rem 0.8rem;
+    color: var(--texto);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus, .form-group select:focus { border-color: var(--verde); }
+
+  .form-section-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--verde);
+    margin: 1.2rem 0 0.8rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--gris-borde);
+  }
+
+  .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; justify-content: flex-end; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--gris-medio);
+    border-left: 4px solid var(--acento);
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    z-index: 300;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    max-width: 300px;
+  }
+
+  .toast.show { transform: translateX(0); }
+  .toast.error { border-left-color: var(--rojo); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--texto-muted);
+  }
+
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state p { font-size: 0.9rem; }
+
+  /* PARTIDO CARD */
+  .partido-card {
+    background: var(--gris-medio);
+    border: 1px solid var(--gris-borde);
+    border-radius: 8px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .partido-equipos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .partido-equipo { flex: 1; text-align: center; }
+  .partido-equipo .nombre { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1px; }
+  .partido-score { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--acento); padding: 0 1rem; }
+  .partido-vs { font-size: 0.8rem; color: var(--texto-muted); }
+
+  .partido-meta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.8rem;
+    font-size: 0.75rem;
+    color: var(--texto-muted);
+    flex-wrap: wrap;
+  }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 0.5rem;
+    color: var(--texto-muted);
+  }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--gris-borde);
+    border-top-color: var(--verde);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Liga Fútbol <span>API Dashboard</span></div>
+  <div class="api-status">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Conectando...</span>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('posiciones')">🏆 Posiciones</button>
+  <button onclick="showSection('equipos')">⚽ Equipos</button>
+  <button onclick="showSection('jugadores')">👤 Jugadores</button>
+  <button onclick="showSection('partidos')">📅 Partidos</button>
+  <button onclick="showSection('eventos')">⚡ Eventos</button>
+  <button onclick="showSection('entrenadores')">🎯 Entrenadores</button>
+  <button onclick="showSection('competiciones')">🥇 Competiciones</button>
+</nav>
+
+<main>
+
+  <!-- POSICIONES -->
+  <section class="section active" id="sec-posiciones">
+    <div class="section-header">
+      <div class="section-title">Tabla de Posiciones</div>
+      <button class="btn btn-secondary" onclick="loadPosiciones()">↻ Actualizar</button>
+    </div>
+    <div class="tabla-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Equipo</th>
+            <th>PJ</th>
+            <th>PG</th>
+            <th>PE</th>
+            <th>PP</th>
+            <th>GF</th>
+            <th>GC</th>
+            <th>DG</th>
+            <th>PTS</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-posiciones">
+          <tr><td colspan="10"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- EQUIPOS -->
+  <section class="section" id="sec-equipos">
+    <div class="section-header">
+      <div class="section-title">Equipos</div>
+      <button class="btn btn-primary" onclick="openModal('modal-equipo')">+ Nuevo Equipo</button>
+    </div>
+    <div class="cards-grid" id="grid-equipos">
+      <div class="loading"><div class="spinner"></div> Cargando...</div>
+    </div>
+  </section>
+
+  <!-- JUGADORES -->
+  <section class="section" id="sec-jugadores">
+    <div class="section-header">
+      <div class="section-title">Jugadores</div>
+      <button class="btn btn-primary" onclick="openModal('modal-jugador')">+ Nuevo Jugador</button>
+    </div>
+    <div class="cards-grid" id="grid-jugadores">
+      <div class="loading"><div class="spinner"></div> Cargando...</div>
+    </div>
+  </section>
+
+  <!-- PARTIDOS -->
+  <section class="section" id="sec-partidos">
+    <div class="section-header">
+      <div class="section-title">Partidos</div>
+      <button class="btn btn-primary" onclick="openModal('modal-partido')">+ Nuevo Partido</button>
+    </div>
+    <div id="lista-partidos">
+      <div class="loading"><div class="spinner"></div> Cargando...</div>
+    </div>
+  </section>
+
+  <!-- EVENTOS -->
+  <section class="section" id="sec-eventos">
+    <div class="section-header">
+      <div class="section-title">Eventos</div>
+      <button class="btn btn-primary" onclick="openModal('modal-evento')">+ Registrar Evento</button>
+    </div>
+    <div class="cards-grid" id="grid-eventos">
+      <div class="loading"><div class="spinner"></div> Cargando...</div>
+    </div>
+  </section>
+
+  <!-- ENTRENADORES -->
+  <section class="section" id="sec-entrenadores">
+    <div class="section-header">
+      <div class="section-title">Entrenadores</div>
+      <button class="btn btn-primary" onclick="openModal('modal-entrenador')">+ Nuevo Entrenador</button>
+    </div>
+    <div class="cards-grid" id="grid-entrenadores">
+      <div class="loading"><div class="spinner"></div> Cargando...</div>
+    </div>
+  </section>
+
+  <!-- COMPETICIONES -->
+  <section class="section" id="sec-competiciones">
+    <div class="section-header">
+      <div class="section-title">Competiciones</div>
+      <button class="btn btn-primary" onclick="openModal('modal-competicion')">+ Nueva Competición</button>
+    </div>
+    <div class="cards-grid" id="grid-competiciones">
+      <div class="loading"><div class="spinner"></div> Cargando...</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODALES -->
+
+<!-- Modal Equipo -->
+<div class="modal-overlay" id="modal-equipo">
+  <div class="modal">
+    <div class="modal-title">Nuevo Equipo</div>
+    <div class="form-group">
+      <label>Nombre del Equipo *</label>
+      <input type="text" id="eq-nombre" placeholder="Ej: Atlético FC">
+    </div>
+    <div class="form-group">
+      <label>URL del Logo</label>
+      <input type="text" id="eq-logo" placeholder="https://...">
+    </div>
+    <div class="form-section-title">Delegado</div>
+    <div class="form-group">
+      <label>Nombre del Delegado</label>
+      <input type="text" id="eq-del-nombre">
+    </div>
+    <div class="form-group">
+      <label>Teléfono</label>
+      <input type="text" id="eq-del-tel">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="eq-del-email">
+    </div>
+    <div class="form-section-title">Colores</div>
+    <div class="form-group">
+      <label>Color Principal</label>
+      <input type="text" id="eq-color1" placeholder="Ej: rojo">
+    </div>
+    <div class="form-group">
+      <label>Color Alternativo</label>
+      <input type="text" id="eq-color2" placeholder="Ej: blanco">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-equipo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearEquipo()">Crear Equipo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Jugador -->
+<div class="modal-overlay" id="modal-jugador">
+  <div class="modal">
+    <div class="modal-title">Nuevo Jugador</div>
+    <div class="form-group">
+      <label>Nombre *</label>
+      <input type="text" id="jug-nombre">
+    </div>
+    <div class="form-group">
+      <label>Apellido *</label>
+      <input type="text" id="jug-apellido">
+    </div>
+    <div class="form-group">
+      <label>Documento</label>
+      <input type="text" id="jug-doc">
+    </div>
+    <div class="form-group">
+      <label>Dorsal</label>
+      <input type="number" id="jug-dorsal">
+    </div>
+    <div class="form-group">
+      <label>Equipo *</label>
+      <select id="jug-equipo"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-jugador')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearJugador()">Crear Jugador</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Partido -->
+<div class="modal-overlay" id="modal-partido">
+  <div class="modal">
+    <div class="modal-title">Nuevo Partido</div>
+    <div class="form-group">
+      <label>Equipo Local *</label>
+      <select id="par-local"></select>
+    </div>
+    <div class="form-group">
+      <label>Equipo Visitante *</label>
+      <select id="par-visitante"></select>
+    </div>
+    <div class="form-group">
+      <label>Fecha y Hora</label>
+      <input type="datetime-local" id="par-fecha">
+    </div>
+    <div class="form-group">
+      <label>Jornada</label>
+      <input type="text" id="par-jornada" placeholder="Ej: Jornada 1">
+    </div>
+    <div class="form-group">
+      <label>Sede</label>
+      <input type="text" id="par-sede" placeholder="Ej: Estadio Municipal">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-partido')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearPartido()">Crear Partido</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Evento -->
+<div class="modal-overlay" id="modal-evento">
+  <div class="modal">
+    <div class="modal-title">Registrar Evento</div>
+    <div class="form-group">
+      <label>Tipo de Acción *</label>
+      <select id="ev-tipo">
+        <option value="GOL">⚽ Gol</option>
+        <option value="TARJETA_AMARILLA">🟨 Tarjeta Amarilla</option>
+        <option value="TARJETA_ROJA">🟥 Tarjeta Roja</option>
+        <option value="AUTOGOL">😬 Autogol</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Minuto</label>
+      <input type="number" id="ev-minuto" min="1" max="120">
+    </div>
+    <div class="form-group">
+      <label>Partido *</label>
+      <select id="ev-partido"></select>
+    </div>
+    <div class="form-group">
+      <label>Jugador *</label>
+      <select id="ev-jugador"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-evento')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearEvento()">Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Entrenador -->
+<div class="modal-overlay" id="modal-entrenador">
+  <div class="modal">
+    <div class="modal-title">Nuevo Entrenador</div>
+    <div class="form-group">
+      <label>Nombre *</label>
+      <input type="text" id="ent-nombre">
+    </div>
+    <div class="form-group">
+      <label>Apellido</label>
+      <input type="text" id="ent-apellido">
+    </div>
+    <div class="form-group">
+      <label>Nacionalidad</label>
+      <input type="text" id="ent-nacionalidad">
+    </div>
+    <div class="form-group">
+      <label>Edad</label>
+      <input type="number" id="ent-edad">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-entrenador')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearEntrenador()">Crear Entrenador</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Competicion -->
+<div class="modal-overlay" id="modal-competicion">
+  <div class="modal">
+    <div class="modal-title">Nueva Competición</div>
+    <div class="form-group">
+      <label>Nombre *</label>
+      <input type="text" id="comp-nombre">
+    </div>
+    <div class="form-group">
+      <label>País</label>
+      <input type="text" id="comp-pais">
+    </div>
+    <div class="form-group">
+      <label>Temporada</label>
+      <input type="text" id="comp-temporada" placeholder="Ej: 2026">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-competicion')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearCompeticion()">Crear</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Resultado -->
+<div class="modal-overlay" id="modal-resultado">
+  <div class="modal">
+    <div class="modal-title">Registrar Resultado</div>
+    <input type="hidden" id="res-partido-id">
+    <div class="form-group">
+      <label>Goles Local</label>
+      <input type="number" id="res-local" min="0" value="0">
+    </div>
+    <div class="form-group">
+      <label>Goles Visitante</label>
+      <input type="number" id="res-visitante" min="0" value="0">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-resultado')">Cancelar</button>
+      <button class="btn btn-primary" onclick="registrarResultado()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8080/api';
+let equiposCache = [];
+
+// ===================== UTILIDADES =====================
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  event.target.classList.add('active');
+  loadSection(name);
+}
+
+function loadSection(name) {
+  const loaders = {
+    posiciones: loadPosiciones,
+    equipos: loadEquipos,
+    jugadores: loadJugadores,
+    partidos: loadPartidos,
+    eventos: loadEventos,
+    entrenadores: loadEntrenadores,
+    competiciones: loadCompeticiones
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+  if (id === 'modal-jugador') loadEquiposEnSelect('jug-equipo');
+  if (id === 'modal-partido') { loadEquiposEnSelect('par-local'); loadEquiposEnSelect('par-visitante'); }
+  if (id === 'modal-evento') { loadPartidosEnSelect('ev-partido'); loadJugadoresEnSelect('ev-jugador'); }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+});
+
+function showToast(msg, error = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (error ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+async function api(method, path, body) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  if (!res.ok) throw new Error(await res.text());
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+// ===================== STATUS =====================
+async function checkStatus() {
+  try {
+    await fetch(API + '/equipos');
+    document.getElementById('statusDot').classList.add('online');
+    document.getElementById('statusText').textContent = 'API en línea';
+  } catch {
+    document.getElementById('statusText').textContent = 'API desconectada';
+  }
+}
+
+// ===================== POSICIONES =====================
+async function loadPosiciones() {
+  const tbody = document.getElementById('tbody-posiciones');
+  tbody.innerHTML = '<tr><td colspan="10"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>';
+  try {
+    const data = await api('GET', '/posiciones');
+    if (!data.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--texto-muted);padding:2rem">Sin datos aún</td></tr>'; return; }
+    tbody.innerHTML = data.map((f, i) => `
+      <tr>
+        <td><span class="pos-num pos-${i < 3 ? i+1 : 'other'}">${i+1}</span></td>
+        <td><strong>${f.nombreEquipo}</strong></td>
+        <td>${f.pj}</td>
+        <td>${f.pg}</td>
+        <td>${f.pe}</td>
+        <td>${f.pp}</td>
+        <td>${f.gf}</td>
+        <td>${f.gc}</td>
+        <td style="color:${f.dg > 0 ? 'var(--acento)' : f.dg < 0 ? 'var(--rojo)' : 'inherit'}">${f.dg > 0 ? '+' : ''}${f.dg}</td>
+        <td><strong style="color:var(--acento)">${f.puntos}</strong></td>
+      </tr>`).join('');
+  } catch { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--rojo);padding:2rem">Error al cargar</td></tr>'; }
+}
+
+// ===================== EQUIPOS =====================
+async function loadEquipos() {
+  const grid = document.getElementById('grid-equipos');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  try {
+    const data = await api('GET', '/equipos');
+    equiposCache = data;
+    if (!data.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">⚽</div><p>No hay equipos aún</p></div>'; return; }
+    grid.innerHTML = data.map(e => `
+      <div class="card">
+        <div class="card-title">${e.nombre}</div>
+        ${e.entrenador ? `<div class="card-row"><span class="label">Entrenador</span><span class="value">${e.entrenador.nombre} ${e.entrenador.apellido || ''}</span></div>` : ''}
+        ${e.delegado?.nombre ? `<div class="card-row"><span class="label">Delegado</span><span class="value">${e.delegado.nombre}</span></div>` : ''}
+        ${e.delegado?.telefono ? `<div class="card-row"><span class="label">Teléfono</span><span class="value">${e.delegado.telefono}</span></div>` : ''}
+        ${e.colores?.principal ? `<div class="card-row"><span class="label">Colores</span><span class="value">${e.colores.principal} / ${e.colores.alternativo || '-'}</span></div>` : ''}
+        <div class="card-actions">
+          <button class="btn btn-danger btn-sm" onclick="eliminarEquipo('${e.id}')">Eliminar</button>
+        </div>
+      </div>`).join('');
+  } catch { grid.innerHTML = '<div class="empty-state"><p style="color:var(--rojo)">Error al cargar equipos</p></div>'; }
+}
+
+async function crearEquipo() {
+  const nombre = document.getElementById('eq-nombre').value.trim();
+  if (!nombre) { showToast('El nombre es requerido', true); return; }
+  try {
+    await api('POST', '/equipos', {
+      nombre,
+      logoUrl: document.getElementById('eq-logo').value,
+      delegado: { nombre: document.getElementById('eq-del-nombre').value, telefono: document.getElementById('eq-del-tel').value, email: document.getElementById('eq-del-email').value },
+      colores: { principal: document.getElementById('eq-color1').value, alternativo: document.getElementById('eq-color2').value }
+    });
+    closeModal('modal-equipo');
+    showToast('✅ Equipo creado');
+    loadEquipos();
+  } catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+async function eliminarEquipo(id) {
+  if (!confirm('¿Eliminar este equipo?')) return;
+  try { await api('DELETE', '/equipos/' + id); showToast('Equipo eliminado'); loadEquipos(); }
+  catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+// ===================== JUGADORES =====================
+async function loadJugadores() {
+  const grid = document.getElementById('grid-jugadores');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  try {
+    const data = await api('GET', '/jugadores');
+    if (!data.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>No hay jugadores aún</p></div>'; return; }
+    grid.innerHTML = data.map(j => `
+      <div class="card">
+        <div class="card-title">${j.nombre} ${j.apellido}</div>
+        <div class="card-row"><span class="label">Dorsal</span><span class="value">#${j.dorsal || '-'}</span></div>
+        <div class="card-row"><span class="label">Equipo</span><span class="value">${j.equipo?.nombre || 'Sin equipo'}</span></div>
+        <div class="card-row"><span class="label">Estado</span><span class="value">
+          <span class="badge ${j.estado === 'ACTIVO' ? 'badge-green' : j.estado === 'SUSPENDIDO' ? 'badge-red' : 'badge-yellow'}">${j.estado}</span>
+        </span></div>
+        <div class="card-actions">
+          <button class="btn btn-danger btn-sm" onclick="eliminarJugador('${j.id}')">Eliminar</button>
+        </div>
+      </div>`).join('');
+  } catch { grid.innerHTML = '<div class="empty-state"><p style="color:var(--rojo)">Error al cargar jugadores</p></div>'; }
+}
+
+async function crearJugador() {
+  const nombre = document.getElementById('jug-nombre').value.trim();
+  const apellido = document.getElementById('jug-apellido').value.trim();
+  const equipoId = document.getElementById('jug-equipo').value;
+  if (!nombre || !apellido || !equipoId) { showToast('Nombre, apellido y equipo son requeridos', true); return; }
+  try {
+    await api('POST', '/jugadores', {
+      nombre, apellido,
+      documento: document.getElementById('jug-doc').value,
+      dorsal: parseInt(document.getElementById('jug-dorsal').value) || null,
+      equipo: { id: equipoId }
+    });
+    closeModal('modal-jugador');
+    showToast('✅ Jugador creado');
+    loadJugadores();
+  } catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+async function eliminarJugador(id) {
+  if (!confirm('¿Eliminar jugador?')) return;
+  try { await api('DELETE', '/jugadores/' + id); showToast('Jugador eliminado'); loadJugadores(); }
+  catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+// ===================== PARTIDOS =====================
+async function loadPartidos() {
+  const lista = document.getElementById('lista-partidos');
+  lista.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  try {
+    const data = await api('GET', '/partidos');
+    if (!data.length) { lista.innerHTML = '<div class="empty-state"><div class="icon">📅</div><p>No hay partidos aún</p></div>'; return; }
+    lista.innerHTML = data.map(p => {
+      const estadoBadge = p.estado === 'FINALIZADO' ? 'badge-green' : p.estado === 'EN_CURSO' ? 'badge-yellow' : p.estado === 'SUSPENDIDO' ? 'badge-red' : 'badge-blue';
+      return `
+      <div class="partido-card">
+        <div class="partido-equipos">
+          <div class="partido-equipo"><div class="nombre">${p.equipoLocal?.nombre || 'Local'}</div></div>
+          <div style="text-align:center">
+            ${p.estado === 'FINALIZADO' ? `<div class="partido-score">${p.golesLocal} - ${p.golesVisitante}</div>` : `<div class="partido-vs">VS</div>`}
+            <span class="badge ${estadoBadge}">${p.estado}</span>
+          </div>
+          <div class="partido-equipo"><div class="nombre">${p.equipoVisitante?.nombre || 'Visitante'}</div></div>
+        </div>
+        <div class="partido-meta">
+          ${p.jornada ? `<span>📋 ${p.jornada}</span>` : ''}
+          ${p.sede ? `<span>📍 ${p.sede}</span>` : ''}
+          ${p.fecha ? `<span>🕐 ${new Date(p.fecha).toLocaleString('es-CO')}</span>` : ''}
+        </div>
+        <div class="card-actions" style="margin-top:0.8rem">
+          ${p.estado !== 'FINALIZADO' ? `<button class="btn btn-primary btn-sm" onclick="abrirResultado('${p.id}')">Registrar Resultado</button>` : ''}
+          <button class="btn btn-danger btn-sm" onclick="eliminarPartido('${p.id}')">Eliminar</button>
+        </div>
+      </div>`}).join('');
+  } catch { lista.innerHTML = '<div class="empty-state"><p style="color:var(--rojo)">Error al cargar partidos</p></div>'; }
+}
+
+async function crearPartido() {
+  const localId = document.getElementById('par-local').value;
+  const visitanteId = document.getElementById('par-visitante').value;
+  if (!localId || !visitanteId) { showToast('Selecciona los equipos', true); return; }
+  if (localId === visitanteId) { showToast('Los equipos deben ser diferentes', true); return; }
+  try {
+    const fecha = document.getElementById('par-fecha').value;
+    await api('POST', '/partidos', {
+      equipoLocal: { id: localId },
+      equipoVisitante: { id: visitanteId },
+      fecha: fecha ? fecha + ':00' : null,
+      jornada: document.getElementById('par-jornada').value,
+      sede: document.getElementById('par-sede').value
+    });
+    closeModal('modal-partido');
+    showToast('✅ Partido creado');
+    loadPartidos();
+  } catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+function abrirResultado(id) {
+  document.getElementById('res-partido-id').value = id;
+  document.getElementById('res-local').value = 0;
+  document.getElementById('res-visitante').value = 0;
+  openModal('modal-resultado');
+}
+
+async function registrarResultado() {
+  const id = document.getElementById('res-partido-id').value;
+  const gl = document.getElementById('res-local').value;
+  const gv = document.getElementById('res-visitante').value;
+  try {
+    await api('PATCH', `/partidos/${id}/resultado?golesLocal=${gl}&golesVisitante=${gv}`);
+    closeModal('modal-resultado');
+    showToast('✅ Resultado registrado');
+    loadPartidos();
+  } catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+async function eliminarPartido(id) {
+  if (!confirm('¿Eliminar partido?')) return;
+  try { await api('DELETE', '/partidos/' + id); showToast('Partido eliminado'); loadPartidos(); }
+  catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+// ===================== EVENTOS =====================
+async function loadEventos() {
+  const grid = document.getElementById('grid-eventos');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  try {
+    const data = await api('GET', '/eventos');
+    if (!data.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">⚡</div><p>No hay eventos aún</p></div>'; return; }
+    const iconos = { GOL: '⚽', TARJETA_AMARILLA: '🟨', TARJETA_ROJA: '🟥', AUTOGOL: '😬' };
+    grid.innerHTML = data.map(e => `
+      <div class="card">
+        <div class="card-title">${iconos[e.tipoAccion] || '⚡'} ${e.tipoAccion.replace('_', ' ')}</div>
+        <div class="card-row"><span class="label">Jugador</span><span class="value">${e.jugador?.nombre || '-'} ${e.jugador?.apellido || ''}</span></div>
+        <div class="card-row"><span class="label">Minuto</span><span class="value">${e.minuto ? e.minuto + "'" : '-'}</span></div>
+        <div class="card-actions">
+          <button class="btn btn-danger btn-sm" onclick="eliminarEvento('${e.id}')">Eliminar</button>
+        </div>
+      </div>`).join('');
+  } catch { grid.innerHTML = '<div class="empty-state"><p style="color:var(--rojo)">Error al cargar eventos</p></div>'; }
+}
+
+async function crearEvento() {
+  const partidoId = document.getElementById('ev-partido').value;
+  const jugadorId = document.getElementById('ev-jugador').value;
+  if (!partidoId || !jugadorId) { showToast('Selecciona partido y jugador', true); return; }
+  try {
+    await api('POST', '/eventos', {
+      tipoAccion: document.getElementById('ev-tipo').value,
+      minuto: parseInt(document.getElementById('ev-minuto').value) || null,
+      partido: { id: partidoId },
+      jugador: { id: jugadorId }
+    });
+    closeModal('modal-evento');
+    showToast('✅ Evento registrado');
+    loadEventos();
+  } catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+async function eliminarEvento(id) {
+  if (!confirm('¿Eliminar evento?')) return;
+  try { await api('DELETE', '/eventos/' + id); showToast('Evento eliminado'); loadEventos(); }
+  catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+// ===================== ENTRENADORES =====================
+async function loadEntrenadores() {
+  const grid = document.getElementById('grid-entrenadores');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  try {
+    const data = await api('GET', '/entrenadores');
+    if (!data.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">🎯</div><p>No hay entrenadores aún</p></div>'; return; }
+    grid.innerHTML = data.map(e => `
+      <div class="card">
+        <div class="card-title">${e.nombre} ${e.apellido || ''}</div>
+        <div class="card-row"><span class="label">Nacionalidad</span><span class="value">${e.nacionalidad || '-'}</span></div>
+        <div class="card-row"><span class="label">Edad</span><span class="value">${e.edad || '-'} años</span></div>
+        <div class="card-actions">
+          <button class="btn btn-danger btn-sm" onclick="eliminarEntrenador('${e.id}')">Eliminar</button>
+        </div>
+      </div>`).join('');
+  } catch { grid.innerHTML = '<div class="empty-state"><p style="color:var(--rojo)">Error al cargar</p></div>'; }
+}
+
+async function crearEntrenador() {
+  const nombre = document.getElementById('ent-nombre').value.trim();
+  if (!nombre) { showToast('El nombre es requerido', true); return; }
+  try {
+    await api('POST', '/entrenadores', {
+      nombre,
+      apellido: document.getElementById('ent-apellido').value,
+      nacionalidad: document.getElementById('ent-nacionalidad').value,
+      edad: parseInt(document.getElementById('ent-edad').value) || 0
+    });
+    closeModal('modal-entrenador');
+    showToast('✅ Entrenador creado');
+    loadEntrenadores();
+  } catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+async function eliminarEntrenador(id) {
+  if (!confirm('¿Eliminar entrenador?')) return;
+  try { await api('DELETE', '/entrenadores/' + id); showToast('Eliminado'); loadEntrenadores(); }
+  catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+// ===================== COMPETICIONES =====================
+async function loadCompeticiones() {
+  const grid = document.getElementById('grid-competiciones');
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div> Cargando...</div>';
+  try {
+    const data = await api('GET', '/competiciones');
+    if (!data.length) { grid.innerHTML = '<div class="empty-state"><div class="icon">🥇</div><p>No hay competiciones aún</p></div>'; return; }
+    grid.innerHTML = data.map(c => `
+      <div class="card">
+        <div class="card-title">${c.nombre}</div>
+        <div class="card-row"><span class="label">País</span><span class="value">${c.pais || '-'}</span></div>
+        <div class="card-row"><span class="label">Temporada</span><span class="value">${c.temporada || '-'}</span></div>
+        <div class="card-row"><span class="label">Equipos</span><span class="value">${c.equipoIds?.length || 0}</span></div>
+        <div class="card-actions">
+          <button class="btn btn-danger btn-sm" onclick="eliminarCompeticion('${c.id}')">Eliminar</button>
+        </div>
+      </div>`).join('');
+  } catch { grid.innerHTML = '<div class="empty-state"><p style="color:var(--rojo)">Error al cargar</p></div>'; }
+}
+
+async function crearCompeticion() {
+  const nombre = document.getElementById('comp-nombre').value.trim();
+  if (!nombre) { showToast('El nombre es requerido', true); return; }
+  try {
+    await api('POST', '/competiciones', {
+      nombre,
+      pais: document.getElementById('comp-pais').value,
+      temporada: document.getElementById('comp-temporada').value,
+      equipoIds: []
+    });
+    closeModal('modal-competicion');
+    showToast('✅ Competición creada');
+    loadCompeticiones();
+  } catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+async function eliminarCompeticion(id) {
+  if (!confirm('¿Eliminar competición?')) return;
+  try { await api('DELETE', '/competiciones/' + id); showToast('Eliminada'); loadCompeticiones(); }
+  catch (e) { showToast('Error: ' + e.message, true); }
+}
+
+// ===================== SELECTS =====================
+async function loadEquiposEnSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">Selecciona un equipo...</option>';
+  try {
+    const data = await api('GET', '/equipos');
+    data.forEach(e => sel.innerHTML += `<option value="${e.id}">${e.nombre}</option>`);
+  } catch {}
+}
+
+async function loadPartidosEnSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">Selecciona un partido...</option>';
+  try {
+    const data = await api('GET', '/partidos');
+    data.forEach(p => sel.innerHTML += `<option value="${p.id}">${p.equipoLocal?.nombre || '?'} vs ${p.equipoVisitante?.nombre || '?'}</option>`);
+  } catch {}
+}
+
+async function loadJugadoresEnSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">Selecciona un jugador...</option>';
+  try {
+    const data = await api('GET', '/jugadores');
+    data.forEach(j => sel.innerHTML += `<option value="${j.id}">${j.nombre} ${j.apellido} (${j.equipo?.nombre || '?'})</option>`);
+  } catch {}
+}
+
+// ===================== INIT =====================
+checkStatus();
+loadPosiciones();
+</script>
+</body>
+</html>
